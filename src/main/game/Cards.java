@@ -86,7 +86,7 @@ public class Cards {
         Optional<VictoryCard> anyVictoryCard = this.victory.stream()
                 .filter(c -> victoryCard.getName().equals(c.getName())).findFirst();
         if (anyVictoryCard.isPresent()) {
-            this.treasure.remove(anyVictoryCard.get());
+            this.victory.remove(anyVictoryCard.get());
             takenCards.add(anyVictoryCard.get());
         }
         return takenCards;
