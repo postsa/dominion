@@ -1,4 +1,4 @@
-package test;
+package test.game;
 
 import main.game.exceptions.NoSuchCardAvaliable;
 import main.game.*;
@@ -35,4 +35,8 @@ public class MockCardMerchant implements CardMerchant {
     public void registerCard(VictoryCard card) { }
 
     public void registerCard(TreasureCard card) { }
+
+    public Cards getInventory() {
+        return null;
+    }
 }

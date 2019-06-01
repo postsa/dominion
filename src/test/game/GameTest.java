@@ -1,5 +1,6 @@
-package test;
+package test.game;
 
+import main.game.Presentor;
 import main.game.exceptions.*;
 import main.game.CardMerchant;
 import main.game.Game;
@@ -17,7 +18,8 @@ public class GameTest {
     @Before
     public void setup() {
         CardMerchant cardMerchant = new MockCardMerchant();
-        this.game = new Game(cardMerchant);
+        Presentor presentor = new MockPresentor();
+        this.game = new Game(cardMerchant, presentor);
     }
 
     @Test(expected = NotEnoughMoneyToBuyCard.class)

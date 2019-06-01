@@ -10,4 +10,6 @@ public interface CardMerchant {
     void registerCard(VictoryCard card);
 
     void registerCard(TreasureCard card);
+
+    Cards getInventory();
 }

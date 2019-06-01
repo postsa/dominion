@@ -131,6 +131,10 @@ public class Supply implements CardMerchant {
             addCardsToInventoryByName(cardName);
     }
 
+    public Cards getInventory() {
+        return this.inventory;
+    }
+
     private enum CardType {
         ACTION,
         VICTORY,

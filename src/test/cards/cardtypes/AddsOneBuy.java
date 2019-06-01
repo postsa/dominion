@@ -9,7 +9,7 @@ public class AddsOneBuy extends ActionCard {
     }
 
     public String getName() {
-        return "Add One Buy";
+        return "Adds One Buy";
     }
 
     public void act(Game game) {

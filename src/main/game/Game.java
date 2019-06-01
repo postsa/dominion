@@ -13,8 +13,9 @@ public class Game {
     private DeckOfCards discard;
     private CardMerchant cardMerchant;
     private Phase phase;
+    private Presentor presentor;
 
-    public Game(CardMerchant cardMerchant) {
+    public Game(CardMerchant cardMerchant, Presentor presentor) {
         this.actionsRemaining = 1;
         this.buysRemaining = 1;
         this.money = 0;
@@ -23,6 +24,7 @@ public class Game {
         this.discard = new DeckOfCards();
         this.cardMerchant = cardMerchant;
         this.phase = Phase.ACTION;
+        this.presentor = presentor;
     }
 
     public Phase getPhase() {
@@ -136,5 +138,9 @@ public class Game {
 
     public void addMoney(int amount) {
         this.money += amount;
+    }
+
+    public void listAvailableCards() {
+        presentor.displayAvailableCards(cardMerchant.getInventory());
     }
 }
