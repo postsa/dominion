@@ -61,6 +61,21 @@ public class DeckOfCards extends Cards {
             this.cardOrder.push(otherDeck.getCardOrder().pop());
     }
 
+    public void put(Cards otherCards) {
+        while (!otherCards.getTreasure().empty()) {
+            this.treasure.push(otherCards.getTreasure().pop());
+            this.cardOrder.push(CardType.TREASURE);
+        }
+        while (!otherCards.getVictoryCards().empty()) {
+            this.victory.push(otherCards.getVictoryCards().pop());
+            this.cardOrder.push(CardType.VICTORY);
+        }
+        while (!otherCards.getActionCards().empty()) {
+            this.actionCards.push(otherCards.getActionCards().pop());
+            this.cardOrder.push(CardType.ACTION);
+        }
+    }
+
     public Stack<CardType> getCardOrder() {
         return this.cardOrder;
     }

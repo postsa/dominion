@@ -1,35 +1,41 @@
 package test.game;
 
+import main.cards.CardCatalog;
 import main.cards.Supply;
+import main.game.controller.Controller;
 import main.game.Game;
-import main.game.Presentor;
+import main.game.Presenter;
 import test.cards.cardtypes.*;
 
 public class TestMain {
     public static void main(String[] args) {
         Supply supply = setupTestSupply();
-        Presentor presentor = new ConsolePresentor();
-        Game game = new Game(supply, presentor);
-        game.listAvailableCards();
+        Presenter presenter = new ConsolePresenter();
+        Controller controller = new ConsoleController();
+        Game game = new Game(supply, presenter, controller);
+        while(!game.isOver()) {
+            game.takePresentableTurn();
+        }
     }
 
     private static Supply setupTestSupply() {
-        Supply supply = new Supply();
+        CardCatalog cardCatalog = new CardCatalog();
         AddsOneAction addsOneAction = new AddsOneAction();
-        supply.registerCard(addsOneAction);
         AddsOneBuy addsOneBuy = new AddsOneBuy();
-        supply.registerCard(addsOneBuy);
         Copper copper = new Copper();
-        supply.registerCard(copper);
         Silver silver = new Silver();
-        supply.registerCard(silver);
         Estate estate = new Estate();
-        supply.registerCard(estate);
-        supply.addInventory(addsOneAction.getName(), 1);
-        supply.addInventory(addsOneBuy.getName(), 2);
-        supply.addInventory(copper.getName(), 3);
-        supply.addInventory(silver.getName());
-        supply.addInventory(estate.getName(), 2);
+        cardCatalog.registerCard(addsOneAction);
+        cardCatalog.registerCard(addsOneBuy);
+        cardCatalog.registerCard(copper);
+        cardCatalog.registerCard(silver);
+        cardCatalog.registerCard(estate);
+        Supply supply = new Supply(cardCatalog);
+        supply.addCardByName(addsOneAction.getName(), 1);
+        supply.addCardByName(addsOneBuy.getName(), 2);
+        supply.addCardByName(copper.getName(), 3);
+        supply.addCardByName(silver.getName());
+        supply.addCardByName(estate.getName(), 2);
         return supply;
     }
 }

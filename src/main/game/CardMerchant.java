@@ -1,15 +1,19 @@
 package main.game;
 
-public interface CardMerchant {
+import java.util.Set;
+
+public interface CardMerchant extends Inventory {
     Cards requestCard(String name);
 
     Purchasable requestCardInfo(String cardName);
 
-    void registerCard(ActionCard card);
-
-    void registerCard(VictoryCard card);
-
-    void registerCard(TreasureCard card);
-
     Cards getInventory();
+
+    int countCardsWithName(String cardName);
+
+    Set<String> requestAvailableCardNames();
+
+    DeckOfCards getStartingDeck();
+
+    Hand createHand();
 }

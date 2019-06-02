@@ -95,6 +95,17 @@ public class DeckOfCardsTest {
     }
 
     @Test
+    public void puttingCardsOntoDeckAddsToCardOrderStack() {
+        Cards cards = new DeckOfCards();
+        cards.add(copper);
+        cards.add(silver);
+        cards.add(new CostsOne());
+        cards.add(estate);
+        deck.put(cards);
+        assertEquals(4, deck.getCardOrder().size());
+    }
+
+    @Test
     public void puttingOtherDeckOntoDeckRemovesAllFromOtherCardOrderStack() {
         DeckOfCards otherDeck = new DeckOfCards();
         otherDeck.add(copper);

@@ -1,5 +1,6 @@
 package main.game;
 
+import java.util.Arrays;
 import java.util.Optional;
 import java.util.Stack;
 
@@ -96,5 +97,20 @@ public class Cards {
         ACTION,
         VICTORY,
         TREASURE
+    }
+
+    public Cards withTreasureCards(TreasureCard... cards) {
+        treasure.addAll(Arrays.asList(cards));
+        return this;
+    }
+
+    public Cards withActionCards(ActionCard... cards) {
+        actionCards.addAll(Arrays.asList(cards));
+        return this;
+    }
+
+    public Cards withVictoryCards(VictoryCard... cards) {
+        victory.addAll(Arrays.asList(cards));
+        return this;
     }
 }

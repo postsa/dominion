@@ -1,14 +1,21 @@
 package test.game;
 
-import main.game.Presentor;
+import main.game.Cards;
+import main.game.controller.Controller;
+import main.game.Presenter;
+import main.game.controller.PlayerInput;
 import main.game.exceptions.*;
 import main.game.CardMerchant;
 import main.game.Game;
 import org.junit.Before;
 import org.junit.Test;
 import test.cards.cardtypes.*;
+import test.game.mocks.MockCardMerchant;
+import test.game.mocks.MockController;
+import test.game.mocks.MockPresenter;
 
 import static main.game.Phase.*;
+import static main.game.controller.InputAction.*;
 import static org.junit.Assert.*;
 
 public class GameTest {
@@ -18,8 +25,9 @@ public class GameTest {
     @Before
     public void setup() {
         CardMerchant cardMerchant = new MockCardMerchant();
-        Presentor presentor = new MockPresentor();
-        this.game = new Game(cardMerchant, presentor);
+        Presenter presenter = new MockPresenter();
+        Controller controller = new MockController();
+        this.game = new Game(cardMerchant, presenter, controller);
     }
 
     @Test(expected = NotEnoughMoneyToBuyCard.class)
@@ -29,7 +37,7 @@ public class GameTest {
     }
 
     @Test(expected = NoSuchCardAvaliable.class)
-    public void canOnlyBuyCardIfAvaliable() {
+    public void canOnlyBuyCardIfAvailable() {
         game.setPhase(BUY);
         game.buyCard("Not Available");
     }
@@ -45,7 +53,15 @@ public class GameTest {
         game.setPhase(BUY);
         game.playTreasure(new Copper());
         game.buyCard("Costs One");
-        assertEquals(1, game.getHand().count());
+        assertEquals(1, game.getHand().getInventory().count());
+    }
+
+    @Test
+    public void buyingCardSubtractsCostOfCard() {
+        game.setPhase(BUY);
+        game.playTreasure(new Copper());
+        game.buyCard("Costs One");
+        assertEquals(0, game.getMoney());
     }
 
     @Test
@@ -54,7 +70,7 @@ public class GameTest {
         assertEquals(1, game.getBuysRemaining());
         game.playTreasure(new Copper());
         game.buyCard("Costs One");
-        assertEquals(1, game.getHand().count());
+        assertEquals(1, game.getHand().getInventory().count());
     }
 
     @Test
@@ -62,7 +78,7 @@ public class GameTest {
         game.setPhase(BUY);
         game.playTreasure(new Copper());
         game.buyCard("Costs One");
-        assertEquals(CostsOne.class, game.getHand().getActionCards().get(0).getClass());
+        assertEquals(CostsOne.class, game.getHand().getInventory().getActionCards().get(0).getClass());
     }
 
     @Test
@@ -80,12 +96,6 @@ public class GameTest {
     @Test
     public void gameStartsInActionPhase() {
         assertEquals(ACTION, game.getPhase());
-    }
-
-    @Test
-    public void gameAdvancesToBuyPhaseAfterAllActionsTaken() {
-        game.takeAction(new CostsOne());
-        assertEquals(BUY, game.getPhase());
     }
 
     @Test(expected = GameNotInBuyPhase.class)
@@ -111,8 +121,9 @@ public class GameTest {
         game.setPhase(BUY);
         game.playTreasure(new Copper());
         game.buyCard("Costs One");
+        game.setPhase(CLEAN_UP);
         game.discardHand();
-        assertEquals(0, game.getHand().count());
+        assertEquals(0, game.getHand().getInventory().count());
     }
 
     @Test
@@ -120,6 +131,7 @@ public class GameTest {
         game.setPhase(BUY);
         game.playTreasure(new Copper());
         game.buyCard("Costs One");
+        game.setPhase(CLEAN_UP);
         game.discardHand();
         assertEquals(1, game.getDiscard().count());
     }
@@ -128,7 +140,7 @@ public class GameTest {
     public void drawingHandFromZeroCardDeckResultsInZeroCardHand() {
         game.setPhase(CLEAN_UP);
         game.drawHand();
-        assertEquals(0, game.getHand().count());
+        assertEquals(0, game.getHand().getInventory().count());
     }
 
     @Test
@@ -137,16 +149,7 @@ public class GameTest {
             game.getDeck().add(new CostsOne());
         game.setPhase(CLEAN_UP);
         game.drawHand();
-        assertEquals(5, game.getHand().count());
-    }
-
-    @Test
-    public void gameAdvancesToCleanUpWhenNoBuysRemain() {
-        game.setPhase(BUY);
-        game.playTreasure(new Copper());
-        game.buyCard("Costs One");
-        assertEquals(0, game.getBuysRemaining());
-        assertEquals(CLEAN_UP, game.getPhase());
+        assertEquals(5, game.getHand().getInventory().count());
     }
 
     @Test(expected = GameNotInCleanUpPhase.class)
@@ -165,8 +168,8 @@ public class GameTest {
         game.addBuy();
         game.buyCard("Costs Zero");
         game.buyCard("Costs Zero");
-        assertNotNull(game.getHand().getActionCards());
-        assertEquals(2, game.getHand().getActionCards().size());
+        assertNotNull(game.getHand().getInventory().getActionCards());
+        assertEquals(2, game.getHand().getInventory().getActionCards().size());
     }
 
     @Test
@@ -201,7 +204,7 @@ public class GameTest {
     public void drawingCardAddsItToHand() {
         game.getDeck().add(new CostsZero());
         game.drawCard();
-        assertEquals(1, game.getHand().count());
+        assertEquals(1, game.getHand().getInventory().count());
     }
 
     @Test
@@ -211,7 +214,7 @@ public class GameTest {
         game.setPhase(CLEAN_UP);
         game.drawHand();
         game.drawCard();
-        assertEquals(6, game.getHand().count());
+        assertEquals(6, game.getHand().getInventory().count());
     }
 
     @Test
@@ -221,8 +224,46 @@ public class GameTest {
         game.getDeck().add(new CostsZero());
         game.setPhase(CLEAN_UP);
         game.drawHand();
-        assertEquals(5, game.getHand().count());
+        assertEquals(5, game.getHand().getInventory().count());
         assertEquals(1, game.getDeck().count());
         assertEquals(0, game.getDiscard().count());
+    }
+
+    @Test
+    public void playingCardsAddsTakesCardActions() {
+        game.setPhase(BUY);
+        game.playCards(new Cards().withTreasureCards(new Copper(), new Copper()));
+        assertEquals(game.getMoney(), 2);
+    }
+
+    @Test
+    public void advancePhaseCorrectlyAdvancesPhase() {
+        game.advancePhase();
+        assertEquals(BUY, game.getPhase());
+        game.advancePhase();
+        assertEquals(CLEAN_UP, game.getPhase());
+        game.advancePhase();
+        assertEquals(ACTION, game.getPhase());
+    }
+
+    @Test
+    public void advancePhasePlayerActionAdvancesPhase() {
+        PlayerInput input = new PlayerInput();
+        input.setInputAction(ADVANCE_TURN);
+        game.processPlayerInput(input);
+        assertEquals(BUY, game.getPhase());
+    }
+
+    @Test
+    public void gameOverInitializedAsFalse() {
+        assertEquals(false, game.isOver());
+    }
+
+    @Test
+    public void quitPlayerInputSetsGameOverTrue() {
+        PlayerInput input = new PlayerInput();
+        input.setInputAction(QUIT);
+        game.processPlayerInput(input);
+        assertEquals(true, game.isOver());
     }
 }

@@ -1,4 +1,4 @@
-package test.game;
+package test.game.mocks;
 
 import main.game.Purchasable;
 
