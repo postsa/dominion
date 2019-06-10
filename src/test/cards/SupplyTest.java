@@ -3,7 +3,6 @@ package test.cards;
 import main.cards.CardCatalog;
 import main.cards.Supply;
 import main.game.DeckOfCards;
-import main.game.Hand;
 import main.game.Purchasable;
 import org.junit.Before;
 import org.junit.Test;

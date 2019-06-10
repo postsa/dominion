@@ -63,7 +63,6 @@ public class CardInventory implements Inventory {
         return this.inventory.count(cardName);
     }
 
-    @Override
     public void addCardByName(String cardName, int quantity) {
         if (quantity <= 0)
             throw new IllegalArgumentException();
@@ -71,12 +70,10 @@ public class CardInventory implements Inventory {
             addCardByName(cardName);
     }
 
-    @Override
     public Cards getInventory() {
         return this.inventory;
     }
 
-    @Override
     public Set<String> requestAvailableCardNames() {
         return cardRegistry.requestAvailableCardNames();
     }

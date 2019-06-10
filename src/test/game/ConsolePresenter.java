@@ -1,12 +1,11 @@
 package test.game;
 
-import main.cards.CardCatalog;
 import main.game.*;
 
 public class ConsolePresenter implements Presenter {
 
     public void displayCardsForSale(CardMerchant cardMerchant) {
-        System.out.println("---- CardCatalog ----");
+        System.out.println("---- Supply ----");
         for (String name : cardMerchant.requestAvailableCardNames()) {
             System.out.println(String.format("%s x%s (%s)", name,
                     cardMerchant.countCardsWithName(name),
@@ -38,6 +37,10 @@ public class ConsolePresenter implements Presenter {
 
     public void displayActionsRemaining(int actionsRemaining) {
         System.out.println(String.format("Actions Remaining: %s.", actionsRemaining));
+    }
+
+    public void displayInputError(Exception ex) {
+        System.out.println(String.format("Unacceptable input: %s", ex.getMessage()));
     }
 
     private void displayActionCards(Cards cards) {

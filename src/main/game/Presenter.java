@@ -12,4 +12,6 @@ public interface Presenter {
     void displayBuysRemaining(int buysRemaining);
 
     void displayActionsRemaining(int actionsRemaining);
+
+    void displayInputError(Exception ex);
 }

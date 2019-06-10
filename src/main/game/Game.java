@@ -7,13 +7,11 @@ import main.game.exceptions.*;
 import static main.game.Phase.*;
 
 public class Game {
+    private Player player;
     private boolean isOver;
     private int money;
     private int actionsRemaining;
     private int buysRemaining;
-    private DeckOfCards deck;
-    private Hand hand;
-    private DeckOfCards discard;
     private Phase phase;
     private CardMerchant cardMerchant;
     private Presenter presenter;
@@ -23,26 +21,19 @@ public class Game {
         this.actionsRemaining = 1;
         this.buysRemaining = 1;
         this.money = 0;
-        this.deck = cardMerchant.getStartingDeck().shuffle();
         this.cardMerchant = cardMerchant;
-        this.discard = new DeckOfCards();
-        this.createStartingHand();
+        this.player = new Player(cardMerchant.createHand(), cardMerchant.getStartingDeck().shuffle());
+        this.player.drawHand();
         this.phase = Phase.ACTION;
         this.presenter = presenter;
         this.controller = controller;
-    }
-
-    private void createStartingHand() {
-        this.phase = Phase.CLEAN_UP;
-        this.hand = cardMerchant.createHand();
-        this.drawHand();
     }
 
     public boolean isOver() {
         return isOver;
     }
 
-    public void setOver(boolean over) {
+    private void setOver(boolean over) {
         isOver = over;
     }
 
@@ -54,32 +45,22 @@ public class Game {
         this.phase = phase;
     }
 
-    public Hand getHand() {
-        return hand;
-    }
-
-    public DeckOfCards getDeck() {
-        return this.deck;
-    }
-
-    public DeckOfCards getDiscard() {
-        return this.discard;
-    }
-
     public int getMoney() {
         return money;
     }
 
-    public void buyCard(String cardName) {
+    public Cards buyCard(String cardName) {
         throwIfNotInBuyPhase();
+        Cards purchasedCards = new Cards();
         Purchasable cardInfo = cardMerchant.requestCardInfo(cardName);
         if (notEnoughMoneyToBuy(cardInfo))
             throw new NotEnoughMoneyToBuyCard();
         if(noBuysRemaining())
             throw new NoBuysRemaining();
-        this.hand.put(cardMerchant.requestCard(cardInfo.getName()));
+        purchasedCards.put(cardMerchant.requestCard(cardInfo.getName()));
         this.money -= cardInfo.getCost();
         this.buysRemaining--;
+        return purchasedCards;
     }
 
     private void throwIfNotInBuyPhase() {
@@ -133,38 +114,16 @@ public class Game {
         return this.actionsRemaining <= 0;
     }
 
-    public void discardHand() {
-        throwIfNotInCleanUpPhase();
-        discard.put(this.hand.getInventory());
-    }
-
-    public void drawHand() {
-        throwIfNotInCleanUpPhase();
-        for (int i = 0; i < 5; i++)
-            drawCard();
-    }
-
-    private void throwIfNotInCleanUpPhase() {
-        if (this.phase != CLEAN_UP)
-            throw new GameNotInCleanUpPhase();
-    }
-
-    public void drawCard() {
-        if (this.deck.count() == 0)
-            this.deck.put(this.discard.shuffle());
-        this.hand.put(this.deck.draw(1));
-    }
-
     public void addMoney(int amount) {
         this.money += amount;
     }
 
-    public void displaySupply() {
+    private void displaySupply() {
         presenter.displayCardsForSale(this.cardMerchant);
     }
 
-    public void displayHand() {
-        presenter.displayHand(this.getHand());
+    private void displayHand() {
+        presenter.displayHand(player.getHand());
     }
 
     private void displayAvailableMoney() {
@@ -198,8 +157,12 @@ public class Game {
     }
 
     private void takeTurn() {
-        PlayerInput input = this.controller.acceptInput();
-        this.processPlayerInput(input);
+        try {
+            PlayerInput input = this.controller.acceptInput();
+            this.processPlayerInput(input);
+        } catch (Exception ex) {
+            presenter.displayInputError(ex);
+        }
     }
 
     public void processPlayerInput(PlayerInput input) {
@@ -211,16 +174,15 @@ public class Game {
                 advancePhase();
                 break;
             case BUY_CARD:
-                this.buyCard(input.getCardName());
+                player.addCardsToDiscard(this.buyCard(input.getCardName()));
                 break;
             case PLAY_CARD:
-                Cards cardsToPlay = this.hand.takeCardsFromHandByName(input.getCardName());
+                Cards cardsToPlay = this.player.takeCardsFromHand(input.getCardName());
                 this.playCards(cardsToPlay);
                 break;
         }
     }
 
-    //needs tests
     public void advancePhase() {
         switch (this.phase) {
             case ACTION:
@@ -243,8 +205,8 @@ public class Game {
     private void putGameInCleanupPhase() {
         this.setPhase(CLEAN_UP);
         this.money = 0;
-        this.discardHand();
-        this.drawHand();
+        this.player.discardHand();
+        this.player.drawHand();
     }
 
     private void putGameInBuyPhase() {

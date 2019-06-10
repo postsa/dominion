@@ -52,7 +52,6 @@ public class Supply extends CardInventory implements CardMerchant {
         return startingDeck;
     }
 
-    @Override
     public Hand createHand() {
         return new PlayerHand(cardRegistry);
     }

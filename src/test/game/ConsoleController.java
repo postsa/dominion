@@ -18,7 +18,8 @@ public class ConsoleController implements Controller {
         scanner.useDelimiter(Pattern.compile("\\n"));
         PlayerInput input = new PlayerInput();
         InputAction inputAction;
-        switch (scanner.next().toLowerCase()) {
+        String command = scanner.next().toLowerCase();
+        switch (command) {
             case "play card":
                 inputAction = PLAY_CARD;
                 break;
@@ -32,7 +33,7 @@ public class ConsoleController implements Controller {
                 inputAction = QUIT;
                 break;
             default:
-                throw new NoSuchAction();
+                throw new NoSuchAction(String.format("Can't process command '%s'", command));
         }
         input.setInputAction(inputAction);
         String nextMessage = "";

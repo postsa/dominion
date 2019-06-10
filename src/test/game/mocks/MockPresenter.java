@@ -14,4 +14,6 @@ public class MockPresenter implements Presenter {
     public void displayBuysRemaining(int buysRemaining) { }
 
     public void displayActionsRemaining(int actionsRemaining) { }
+
+    public void displayInputError(Exception ex) { }
 }
