@@ -1,18 +1,18 @@
 package test.cards.cardtypes;
 
-import main.game.Game;
 import main.game.TreasureCard;
+import main.game.Turn;
 
 public class Silver extends TreasureCard {
-    public String getName() {
-        return "Silver";
-    }
+  public String getName() {
+    return "Silver";
+  }
 
-    public int getCost() {
-        return 3;
-    }
+  public int getCost() {
+    return 3;
+  }
 
-    public void play(Game game) {
-        game.addMoney(2);
-    }
+  public void play(Turn turn) {
+    turn.addMoney(2);
+  }
 }

@@ -1,18 +1,18 @@
 package test.cards.cardtypes;
 
 import main.game.ActionCard;
-import main.game.Game;
+import main.game.Turn;
 
 public class AddsOneAction extends ActionCard {
-    public int getCost() {
-        return 3;
-    }
+  public int getCost() {
+    return 3;
+  }
 
-    public String getName() {
-        return "Adds One Action";
-    }
+  public String getName() {
+    return "Adds One Action";
+  }
 
-    public void act(Game game) {
-        game.addAction();
-    }
+  public void act(Turn turn) {
+    turn.addAction();
+  }
 }

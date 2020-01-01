@@ -1,9 +1,9 @@
 package main.game;
 
 public interface Hand extends Inventory {
-    Cards takeCardsFromHandByName(String... cardName);
+  Cards takeCards(String... cardName);
 
-    Cards takeCardsFromHandByName(String cardName, int quantity);
+  Cards takeCards(String cardName, int quantity);
 
-    void put(Cards cards);
+  void put(Cards cards);
 }

@@ -1,3 +1,3 @@
 package main.game.exceptions;
 
-public class GameNotInCleanUpPhase extends RuntimeException { }
+public class GameNotInCleanUpPhase extends RuntimeException {}

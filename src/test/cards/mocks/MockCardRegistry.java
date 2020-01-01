@@ -5,7 +5,7 @@ import main.game.ActionCard;
 import main.game.CardRegistry;
 import main.game.TreasureCard;
 import main.game.VictoryCard;
-import main.game.exceptions.NoSuchCardAvaliable;
+import main.game.exceptions.NoSuchCardAvailable;
 import test.cards.cardtypes.CostsOne;
 
 import java.util.HashMap;
@@ -16,48 +16,43 @@ import static main.cards.CardType.ACTION;
 
 public class MockCardRegistry implements CardRegistry {
 
-    private Map<String, ActionCard> actionCards;
+  private Map<String, ActionCard> actionCards;
 
-    public MockCardRegistry() {
-        this.actionCards = new HashMap<>();
-        actionCards.put("Costs One", new CostsOne());
-    }
+  public MockCardRegistry() {
+    this.actionCards = new HashMap<>();
+    actionCards.put("Costs One", new CostsOne());
+  }
 
-    public void registerCard(ActionCard card) {
-        actionCards.put(card.getName(), card);
-    }
+  public void registerCard(ActionCard card) {
+    actionCards.put(card.getName(), card);
+  }
 
-    public void registerCard(TreasureCard card) {
+  public void registerCard(TreasureCard card) {}
 
-    }
+  public void registerCard(VictoryCard card) {}
 
-    public void registerCard(VictoryCard card) {
+  public Map<String, ActionCard> getActionCards() {
+    return actionCards;
+  }
 
-    }
+  public Map<String, TreasureCard> getTreasureCards() {
+    return null;
+  }
 
-    public Map<String, ActionCard> getActionCards() {
-        return actionCards;
-    }
+  public Map<String, VictoryCard> getVictoryCards() {
+    return null;
+  }
 
-    public Map<String, TreasureCard> getTreasureCards() {
-        return null;
-    }
+  public boolean cardRegistered(String cardName) {
+    return cardName.equals("Costs One");
+  }
 
-    public Map<String, VictoryCard> getVictoryCards() {
-        return null;
-    }
+  public CardType lookupCardType(String cardName) {
+    if (cardName == "Doesn't Exist") throw new NoSuchCardAvailable("TILT");
+    return ACTION;
+  }
 
-    public boolean cardRegistered(String cardName) {
-        return cardName.equals("Costs One");
-    }
-
-    public CardType lookupCardType(String cardName) {
-        if (cardName == "Doesn't Exist")
-            throw new NoSuchCardAvaliable();
-        return ACTION;
-    }
-
-    public Set<String> requestAvailableCardNames() {
-        return null;
-    }
+  public Set<String> requestAvailableCardNames() {
+    return null;
+  }
 }
