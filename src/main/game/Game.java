@@ -1,34 +1,48 @@
 package main.game;
 
-import main.game.commands.*;
 import main.game.controller.Controller;
 import main.game.controller.PlayerInput;
-import main.game.exceptions.CannotPlayVictoryCard;
 
-import static main.game.Phase.ACTION;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Game {
-  private final Turn turn = new Turn();
-  private Player player;
+  private Player currentPlayer;
   private boolean isOver;
-  private CardMerchant cardMerchant;
   private Presenter presenter;
   private Controller controller;
+  private List<Player> players;
+  private int currentPlayerIndex;
+  private List<Turn> turns;
+  private Turn turn;
+  private CardMerchant cardMerchant;
 
-  public Game(CardMerchant cardMerchant, Presenter presenter, Controller controller) {
-    this.turn.actionsRemaining = 1;
-    this.turn.buysRemaining = 1;
-    this.turn.money = 0;
-    this.cardMerchant = cardMerchant;
-    this.player = new Player(cardMerchant.createHand(), cardMerchant.getStartingDeck().shuffle());
-    this.player.drawHand();
-    this.turn.setPhase(ACTION);
+  public Game(
+      List<Player> players, CardMerchant cardMerchant, Presenter presenter, Controller controller) {
+    this.currentPlayerIndex = -1;
+    this.players = players;
     this.presenter = presenter;
     this.controller = controller;
+    this.turns = new ArrayList<>();
+    this.startNextTurn();
+    this.cardMerchant = cardMerchant;
+  }
+
+  private void startNextTurn() {
+    this.turn = new Turn();
+    this.turns.add(this.turn);
+    if (this.currentPlayerIndex < this.players.size() - 1) this.currentPlayerIndex++;
+    else this.currentPlayerIndex = 0;
+    this.currentPlayer = this.players.get(currentPlayerIndex);
+    this.currentPlayer.startTurn(this.turn);
   }
 
   public boolean isOver() {
     return isOver;
+  }
+
+  public Player getCurrentPlayer() {
+    return currentPlayer;
   }
 
   private void setOver(boolean over) {
@@ -39,47 +53,8 @@ public class Game {
     return turn.getPhase();
   }
 
-  public void setPhase(Phase phase) {
-    turn.setPhase(phase);
-  }
-
-  public int getMoney() {
-    return turn.getMoney();
-  }
-
-  public Cards buyCard(String cardName) {
-    Cards purchasedCards = new Cards();
-    Purchasable cardInfo = cardMerchant.requestCardInfo(cardName);
-
-    Command buyCard = new BuyCard(cardInfo);
-    this.turn.accept(buyCard);
-
-    // This actually takes the card out of the deck
-    Cards cardToBuy = cardMerchant.requestCard(cardInfo.getName());
-    purchasedCards.put(cardToBuy);
-    return purchasedCards;
-  }
-
-  public void playTreasure(TreasureCard treasure) {
-    Command playTreasure = new PlayTreasure(treasure);
-    this.turn.accept(playTreasure);
-  }
-
-  public int getActionsRemaining() {
-    return turn.getActionsRemaining();
-  }
-
-  public int getBuysRemaining() {
-    return turn.getBuysRemaining();
-  }
-
-  public void addBuy() {
-    turn.addBuy();
-  }
-
-  public void takeAction(ActionCard actionCard) {
-    Command takeAction = new TakeAction(actionCard);
-    this.turn.accept(takeAction);
+  private void displayPlayerName() {
+    presenter.displayPlayerName(this.currentPlayer.getName());
   }
 
   private void displaySupply() {
@@ -87,7 +62,7 @@ public class Game {
   }
 
   private void displayHand() {
-    presenter.displayHand(player.getHand());
+    presenter.displayHand(currentPlayer.getHand());
   }
 
   private void displayAvailableMoney() {
@@ -107,6 +82,7 @@ public class Game {
   }
 
   private void displayTurnInformation() {
+    this.displayPlayerName();
     this.displaySupply();
     this.displayHand();
     this.displayPhase();
@@ -135,43 +111,22 @@ public class Game {
         this.setOver(true);
         break;
       case ADVANCE_TURN:
-        this.advancePhase();
+        this.advanceTurn();
         break;
       case BUY_CARD:
-        player.addCardsToDiscard(this.buyCard(input.getCardName()));
+        this.currentPlayer.buyCard(input.getCardName());
         break;
       case PLAY_CARD:
-        Cards cardsToPlay = this.player.takeCardsFromHand(input.getCardName());
-        this.playCards(cardsToPlay);
+        Cards cardsToPlay = this.currentPlayer.takeCardsFromHand(input.getCardName());
+        this.currentPlayer.playCards(cardsToPlay);
         break;
     }
   }
 
-  public void advancePhase() {
-    switch (this.turn.getPhase()) {
-      case ACTION:
-        this.turn.accept(new StartBuyPhase());
-        break;
-      case BUY:
-        this.player.discardHand();
-        this.player.drawHand();
-        this.turn.accept(new StartCleanupPhase());
-        break;
-      case CLEAN_UP:
-        this.turn.accept(new StartActionPhase());
-        break;
-    }
-  }
-
-  public void playCards(Cards cards) {
-    if (!cards.getVictoryCards().empty()) {
-      throw new CannotPlayVictoryCard("Victory cards cannot be played.");
-    }
-    for (TreasureCard treasureCard : cards.getTreasure()) {
-      playTreasure(treasureCard);
-    }
-    for (ActionCard actionCard : cards.getActionCards()) {
-      takeAction(actionCard);
+  public void advanceTurn() {
+    this.currentPlayer.advancePhase();
+    if (this.turn.getPhase() == Phase.OVER) {
+      this.startNextTurn();
     }
   }
 }

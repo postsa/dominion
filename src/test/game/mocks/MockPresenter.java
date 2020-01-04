@@ -19,4 +19,6 @@ public class MockPresenter implements Presenter {
   public void displayActionsRemaining(int actionsRemaining) {}
 
   public void displayInputError(Exception ex) {}
+
+  public void displayPlayerName(String name) {}
 }

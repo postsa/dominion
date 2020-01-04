@@ -2,10 +2,11 @@ package main.game.commands;
 
 import main.game.ActionCard;
 import main.game.Command;
-import main.game.Phase;
 import main.game.Turn;
 import main.game.exceptions.GameNotInActionPhase;
 import main.game.exceptions.NoActionsRemaining;
+
+import static main.game.Phase.ACTION;
 
 public class TakeAction implements Command {
   private ActionCard action;
@@ -15,7 +16,7 @@ public class TakeAction implements Command {
   }
 
   public void execute(Turn turn) {
-    if (turn.getPhase() != Phase.ACTION)
+    if (turn.getPhase() != ACTION)
       throw new GameNotInActionPhase(
           String.format(
               "Cannot play '%s' because the game is not in the action phase", action.getName()));

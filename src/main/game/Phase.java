@@ -3,5 +3,6 @@ package main.game;
 public enum Phase {
   ACTION,
   BUY,
-  CLEAN_UP
+  CLEAN_UP,
+  OVER
 }

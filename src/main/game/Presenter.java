@@ -14,4 +14,6 @@ public interface Presenter {
   void displayActionsRemaining(int actionsRemaining);
 
   void displayInputError(Exception ex);
+
+  void displayPlayerName(String name);
 }

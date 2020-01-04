@@ -3,16 +3,23 @@ package test.game;
 import main.cards.CardCatalog;
 import main.cards.Supply;
 import main.game.Game;
+import main.game.Player;
 import main.game.Presenter;
 import main.game.controller.Controller;
 import test.cards.cardtypes.*;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class TestMain {
   public static void main(String[] args) {
     Supply supply = setupTestSupply();
     Presenter presenter = new ConsolePresenter();
     Controller controller = new ConsoleController();
-    Game game = new Game(supply, presenter, controller);
+    List<Player> players = new ArrayList<>();
+    players.add(new Player("Player 1", supply));
+    players.add(new Player("Player 2", supply));
+    Game game = new Game(players, supply, presenter, controller);
     while (!game.isOver()) {
       game.takePresentableTurn();
     }

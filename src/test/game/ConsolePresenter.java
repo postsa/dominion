@@ -46,6 +46,10 @@ public class ConsolePresenter implements Presenter {
     System.out.println(ex.getMessage());
   }
 
+  public void displayPlayerName(String name) {
+    System.out.println(String.format("Current Player: %s.", name));
+  }
+
   private void displayActionCards(Cards cards) {
     System.out.println("Action Cards");
     for (ActionCard card : cards.getActionCards()) {

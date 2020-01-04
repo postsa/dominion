@@ -3,6 +3,8 @@ package main.game;
 import java.util.ArrayList;
 import java.util.List;
 
+import static main.game.Phase.ACTION;
+
 public class Turn {
   int money;
   int actionsRemaining;
@@ -11,6 +13,7 @@ public class Turn {
   private List<Command> commands;
 
   public Turn() {
+    this.initialize();
     this.commands = new ArrayList<>();
   }
 
@@ -85,5 +88,12 @@ public class Turn {
 
   public boolean noBuysRemaining() {
     return this.getBuysRemaining() <= 0;
+  }
+
+  public void initialize() {
+    this.phase = ACTION;
+    this.initializeActionsRemaining();
+    this.initializeBuysRemaining();
+    this.initializeMoney();
   }
 }
